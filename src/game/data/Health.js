@@ -4,7 +4,6 @@
 class Health {
 
     /**
-     *
      * @param respiratoryRate {Number}  - normal (>=10 && <30), fast (>=30)
      * @param stridor {Boolean}
      * @param hemoptysis {Boolean}
@@ -23,6 +22,22 @@ class Health {
         this._airway = airway;
         this._heartRate = heartRate;
         this._systolicBloodPressure = systolicBloodPressure;
+    }
+
+    /**
+     * @return {Health}
+     */
+    copy() {
+        return new Health({
+            respiratoryRate: this.respiratoryRate,
+            stridor: this.stridor,
+            hemoptysis: this.hemoptysis,
+            cyanosis: this.cyanosis,
+            position: this.position,
+            airway: this.airway,
+            heartRate: this.heartRate,
+            systolicBloodPressure: this.systolicBloodPressure,
+        });
     }
 
     get respiratoryRate() {

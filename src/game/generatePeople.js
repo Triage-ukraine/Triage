@@ -18,6 +18,9 @@ class BloodLossEffect extends Effect {
     apply({health, dT}) {
         let bloodPressure = health.systolicBloodPressure;
         health.systolicBloodPressure = bloodPressure - (this.lossRate * dT);
+        if (health.systolicBloodPressure < 0) {
+            health.systolicBloodPressure = 0;
+        }
     }
 
     get lossRate() {
@@ -31,24 +34,24 @@ function generatePeople() {
             id: generateId(),
             injuries: [
                 new Injury({
-                    id: generateId(), 
+                    id: generateId(),
                     effects: [
                         new BloodLossEffect({lossRate: 0.2})
                     ]
                 })
             ],
             health: new Health({
-                respiratoryRate: 20, 
-                stridor: false, 
-                hemoptysis: false, 
-                cyanosis: false, 
-                position: 'standing', 
-                airway: 'ok', 
-                heartRate: 65, 
+                respiratoryRate: 20,
+                stridor: false,
+                hemoptysis: false,
+                cyanosis: false,
+                position: 'standing',
+                airway: 'ok',
+                heartRate: 65,
                 systolicBloodPressure: 45
-            }), 
+            }),
             gender: "female",
-            age: "30"
+            age: 30
         }),
 
         new Person({
@@ -72,7 +75,7 @@ function generatePeople() {
                 systolicBloodPressure: 60
             }),
             gender: "male",
-            age: "46"
+            age: 46
         })
     ];
 }

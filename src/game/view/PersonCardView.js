@@ -8,7 +8,13 @@ import Health from 'game/data/Health';
 class PersonCardView extends React.PureComponent {
 
     static propTypes = {
-        id: PropTypes.number.isRequired
+        id: PropTypes.number.isRequired,
+        injuries: PropTypes.arrayOf(
+            PropTypes.instanceOf(Injury)
+        ).isRequired,
+        health: PropTypes.instanceOf(Health).isRequired,
+        gender: PropTypes.oneOf(['male', 'female']).isRequired,
+        age: PropTypes.number.isRequired
     };
 
     constructor(props) {
@@ -17,7 +23,10 @@ class PersonCardView extends React.PureComponent {
 
     render() {
         return (
-            <div>Person {this.props.id}</div>
+            <div className="card">
+                <div>Person {this.props.id}</div>
+                <div>BP: {this.props.health.systolicBloodPressure.toFixed(0)}</div>
+            </div>
         );
     }
 

@@ -30,6 +30,10 @@ class Person {
         return this._health;
     }
 
+    set health(value) {
+        this._health = value;
+    }
+
     get gender() {
         return this._gender;
     }

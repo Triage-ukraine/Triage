@@ -3,6 +3,21 @@
     margin: 0;
 }
 
+.toolContainer {
+    float: left;
+    width: 100px;
+}
+
+.tool {
+    padding: 2px;
+    border: 1px solid black;
+    cursor: pointer;
+}
+
+.tool.selected {
+    background-color: #ddffd6;
+}
+
 .cardContainer {
 
 }

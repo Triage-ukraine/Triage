@@ -16,6 +16,11 @@ class Injury {
         this._effects = effects;
     }
 
+    // TODO different effects could be treated with different tools
+    treat() {
+        this._effects = [];
+    }
+
     get id() {
         return this._id;
     }

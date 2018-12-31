@@ -3,47 +3,31 @@ import Ambulance from 'game/data/Ambulance';
 import generateId from 'game/generateId';
 import generatePeople from 'game/generatePeople';
 import simulateHealth from 'game/simulation/simulateHealth';
-import AmbulanceRowView from 'game/view/AmbulanceRowView';
-import PersonCardView from 'game/view/PersonCardView';
+import GameView from 'game/view/GameView';
 import React from "react";
 import ReactDOM from "react-dom";
 import 'style.css';
 
-const Cards = ({peopleArray, ambulanceArray, hospitalDistance, clock}) => {
-    return (
-        <div>
-            <div>{clock.formatTime()}</div>
+function treatPersonInjury({peopleArray, personId, injuryId, toolId}) {
+    const person = peopleArray.find((person)=> person.id === personId);
 
-            <div>
-                {
-                    ambulanceArray.map((ambulance) => {
-                        return <AmbulanceRowView key={ambulance.id}
-                                                 full={ambulance.full}
-                                                 ambulanceDistance={ambulance.distance}
-                                                 hospitalDistance={hospitalDistance}/>
-                    })
-                }
-            </div>
+    if (!person) {
+        return;
+    }
 
-            <div className="cardContainer">
-                {
-                    peopleArray.map((person) => {
-                        return <PersonCardView key={person.id}
-                                               id={person.id}
-                                               age={person.age}
-                                               gender={person.gender}
-                                               health={person.health}
-                                               injuries={person.injuries}/>
-                    })
-                }
-            </div>
-        </div>
-    );
-};
+    const injury = person.injuries.find((injury) => injury.id === injuryId);
+
+    if (!injury) {
+        return;
+    }
+
+    // TODO treating should consume time
+    injury.treat();
+}
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    const clock = new Clock({});
+    const clock = new Clock({multiplier: 2});
 
     const peopleArray = generatePeople();
 
@@ -53,19 +37,36 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let t0 = clock.getTime();
 
+    const inputEvents = [];
+
     // Main loop
     setInterval(function () {
         const t1 = clock.getTime();
         const dT = t1 - t0;
 
+        const inputEvent = inputEvents.shift();
+        if (inputEvent) {
+            inputEvent();
+        }
+
         simulateHealth({dT, peopleArray, ambulanceArray, hospitalDistance});
 
         t0 = t1;
 
-        ReactDOM.render(<Cards clock={clock} peopleArray={peopleArray} ambulanceArray={ambulanceArray} hospitalDistance={hospitalDistance}/>, document.getElementById("game"));
+        ReactDOM.render(<GameView clock={clock}
+                                  peopleArray={peopleArray}
+                                  ambulanceArray={ambulanceArray}
+                                  hospitalDistance={hospitalDistance}
+                                  onInjuryTreat={({personId, injuryId, toolId}) => {
+                                      inputEvents.push(
+                                          function () {
+                                              treatPersonInjury({peopleArray, personId, injuryId, toolId});
+                                          }
+                                      );
+                                  }}/>, document.getElementById("game"));
     }, 1000);
 
-    window.setTimeMultiplier = function(val) {
+    window.setTimeMultiplier = function (val) {
         clock.multiplier = val;
     }
 });

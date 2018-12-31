@@ -13,3 +13,16 @@
     padding: 5px;
     margin: 5px;
 }
+
+.ambulanceRow {
+    width: 500px;
+    padding: 0;
+    border-bottom: 2px solid black;
+}
+
+.ambulanceCar {
+    display: inline-block;
+    width: 15px;
+    height: 10px;
+    background-color: green;
+}

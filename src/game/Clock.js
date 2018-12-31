@@ -2,14 +2,17 @@ class Clock {
 
     /**
      * @param delay {Number} millis
+     * @param multiplier {Number} time multiplier in range [0;10]
      */
-    constructor({delay = 10}) {
+    constructor({delay = 10, multiplier = 1}) {
         this.time = 0;
+        this.multiplier = multiplier;
 
         const thisClass = this;
         this.interval = setInterval(function () {
-            thisClass.time = thisClass.time + delay;
+            thisClass.time = thisClass.time + (delay * thisClass.multiplier);
         }, delay);
+
     }
 
     /**
@@ -36,6 +39,14 @@ class Clock {
         return `${hours}:${minutes}:${seconds}`;
     }
 
+
+    get multiplier() {
+        return this._multiplier;
+    }
+
+    set multiplier(value) {
+        this._multiplier = Math.min(Math.max(value, 0), 10);
+    }
 }
 
 export default Clock

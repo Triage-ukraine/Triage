@@ -8,7 +8,7 @@ import Person from 'game/data/Person';
  * @param hospitalDistance {Number} meters
  */
 function simulateHealth({dT, peopleArray, ambulanceArray, hospitalDistance}) {
-    dT = Math.floor(dT / 1000); // to seconds
+    dT = dT / 1000; // to seconds
 
     if (dT === 0) {
         return;
@@ -18,7 +18,7 @@ function simulateHealth({dT, peopleArray, ambulanceArray, hospitalDistance}) {
 
     ambulanceArray.forEach((ambulance) => {
         if (ambulance.full) {
-            const fullDistance = Math.floor(ambulance.distance + dT * ambulanceSpeed);
+            const fullDistance = ambulance.distance + dT * ambulanceSpeed;
 
             if (fullDistance >= hospitalDistance) {
                 ambulance.full = false;
@@ -30,7 +30,7 @@ function simulateHealth({dT, peopleArray, ambulanceArray, hospitalDistance}) {
             if (peopleArray.length === 0) {
                 return;
             }
-            const fullDistance = Math.floor(ambulance.distance - dT * ambulanceSpeed);
+            const fullDistance = ambulance.distance - dT * ambulanceSpeed;
 
             if (fullDistance <= 0) {
 

@@ -3,7 +3,7 @@ import Ambulance from 'game/data/Ambulance';
 import Person from 'game/data/Person';
 import generateId from 'game/generateId';
 import AmbulanceRowView from 'game/view/AmbulanceRowView';
-import PersonCardView from 'game/view/PersonCardView';
+import DraggablePersonCardListView from 'game/view/DraggablePersonCardListView';
 import PropTypes from 'prop-types';
 import React from "react";
 
@@ -24,7 +24,7 @@ class Tool {
     }
 }
 
-class GameView extends React.Component {
+class GameView extends React.PureComponent {
 
     static propTypes = {
         peopleArray: PropTypes.arrayOf(
@@ -42,7 +42,14 @@ class GameView extends React.Component {
         /**
          * @param {function} ({personId, injuryId, toolId})
          */
-        onInjuryTreat: PropTypes.func.isRequired
+        onInjuryTreat: PropTypes.func.isRequired,
+
+        onPersonMoveStart: PropTypes.func.isRequired,
+
+        /**
+         * @param {function} ({fromIndex, toIndex})
+         */
+        onPersonMoveEnd: PropTypes.func.isRequired
     };
 
     constructor(props) {
@@ -57,15 +64,15 @@ class GameView extends React.Component {
         ];
     }
 
-    onToolClick({id}) {
+    onToolClick = ({id}) => {
         const newVal = this.state.selectedTool != null ? null : id;
 
         this.setState({
             selectedTool: newVal
         })
-    }
+    };
 
-    onInjuryClick({personId, injuryId}) {
+    onInjuryClick = ({personId, injuryId}) => {
         if (this.state.selectedTool) {
             this.props.onInjuryTreat({
                 personId: personId,
@@ -76,7 +83,7 @@ class GameView extends React.Component {
                 selectedTool: null
             });
         }
-    }
+    };
 
     onClockMultiplierChange({value}) {
         // TODO should be implemented other way
@@ -85,7 +92,7 @@ class GameView extends React.Component {
 
     render() {
 
-        const {peopleArray, ambulanceArray, hospitalDistance, clock} = this.props;
+        const {peopleArray, ambulanceArray, hospitalDistance, clock, onPersonMoveStart, onPersonMoveEnd} = this.props;
 
         return (
             <div>
@@ -124,24 +131,12 @@ class GameView extends React.Component {
                             })
                         }
                     </div>
-                    <div className="cardContainer">
-                        {
-                            peopleArray.map((person) => {
-                                return <PersonCardView key={person.id}
-                                                       id={person.id}
-                                                       age={person.age}
-                                                       gender={person.gender}
-                                                       health={person.health}
-                                                       injuries={person.injuries}
-                                                       onInjuryClick={({id}) => {
-                                                           this.onInjuryClick({
-                                                               personId: person.id,
-                                                               injuryId: id,
-                                                           });
-                                                       }}/>
-                            })
-                        }
-                    </div>
+
+                    <DraggablePersonCardListView peopleArray={peopleArray}
+                                                 onPersonMoveStart={onPersonMoveStart}
+                                                 onPersonMoveEnd={onPersonMoveEnd}
+                                                 onInjuryClick={this.onInjuryClick}/>
+
                 </div>
             </div>
         );

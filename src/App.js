@@ -9,7 +9,7 @@ import ReactDOM from "react-dom";
 import 'style.css';
 
 function treatPersonInjury({peopleArray, personId, injuryId, toolId}) {
-    const person = peopleArray.find((person)=> person.id === personId);
+    const person = peopleArray.find((person) => person.id === personId);
 
     if (!person) {
         return;
@@ -23,6 +23,13 @@ function treatPersonInjury({peopleArray, personId, injuryId, toolId}) {
 
     // TODO treating should consume time
     injury.treat();
+}
+
+function movePerson({peopleArray, fromIndex, toIndex}) {
+    const person = peopleArray[fromIndex];
+
+    peopleArray.splice(fromIndex, 1);
+    peopleArray.splice(toIndex, 0, person);
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -39,6 +46,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const inputEvents = [];
 
+    let isMoving = false;
+
     // Main loop
     setInterval(function () {
         const t1 = clock.getTime();
@@ -53,6 +62,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         t0 = t1;
 
+        if (isMoving) {
+            return;
+        }
+
+        // TODO split rendering of ambulances and cards
         ReactDOM.render(<GameView clock={clock}
                                   peopleArray={peopleArray}
                                   ambulanceArray={ambulanceArray}
@@ -61,6 +75,15 @@ document.addEventListener("DOMContentLoaded", function () {
                                       inputEvents.push(
                                           function () {
                                               treatPersonInjury({peopleArray, personId, injuryId, toolId});
+                                          }
+                                      );
+                                  }}
+                                  onPersonMoveStart={() => isMoving = true}
+                                  onPersonMoveEnd={({fromIndex, toIndex}) => {
+                                      inputEvents.push(
+                                          function () {
+                                              movePerson({peopleArray, fromIndex, toIndex});
+                                              isMoving = false;
                                           }
                                       );
                                   }}/>, document.getElementById("game"));

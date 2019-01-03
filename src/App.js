@@ -3,7 +3,10 @@ import Ambulance from 'game/data/Ambulance';
 import generateId from 'game/generateId';
 import generatePeople from 'game/generatePeople';
 import simulateHealth from 'game/simulation/simulateHealth';
-import GameView from 'game/view/GameView';
+
+import AmbulanceListView from 'game/view/ambulance/AmbulanceListView';
+import ClockView from 'game/view/ClockView';
+import InteractiveGameView from 'game/view/InteractiveGameView';
 import React from "react";
 import ReactDOM from "react-dom";
 import 'style.css';
@@ -36,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const clock = new Clock({multiplier: 2});
 
-    const peopleArray = generatePeople();
+    let peopleArray = generatePeople();
 
     const hospitalDistance = 2000;
 
@@ -46,47 +49,46 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const inputEvents = [];
 
-    let isMoving = false;
-
     // Main loop
     setInterval(function () {
         const t1 = clock.getTime();
         const dT = t1 - t0;
 
-        const inputEvent = inputEvents.shift();
-        if (inputEvent) {
+        let inputEvent;
+        while (inputEvent = inputEvents.shift()) {
             inputEvent();
         }
 
         simulateHealth({dT, peopleArray, ambulanceArray, hospitalDistance});
 
+        peopleArray = peopleArray.slice();
+
         t0 = t1;
 
-        if (isMoving) {
-            return;
-        }
+        ReactDOM.render(<ClockView clock={clock}/>, document.getElementById("clock"));
 
-        // TODO split rendering of ambulances and cards
-        ReactDOM.render(<GameView clock={clock}
-                                  peopleArray={peopleArray}
-                                  ambulanceArray={ambulanceArray}
-                                  hospitalDistance={hospitalDistance}
-                                  onInjuryTreat={({personId, injuryId, toolId}) => {
-                                      inputEvents.push(
-                                          function () {
-                                              treatPersonInjury({peopleArray, personId, injuryId, toolId});
-                                          }
-                                      );
-                                  }}
-                                  onPersonMoveStart={() => isMoving = true}
-                                  onPersonMoveEnd={({fromIndex, toIndex}) => {
-                                      inputEvents.push(
-                                          function () {
-                                              movePerson({peopleArray, fromIndex, toIndex});
-                                              isMoving = false;
-                                          }
-                                      );
-                                  }}/>, document.getElementById("game"));
+        ReactDOM.render(<AmbulanceListView ambulanceArray={ambulanceArray}
+                                           hospitalDistance={hospitalDistance}/>, document.getElementById("ambulance"));
+
+        ReactDOM.render(
+            <InteractiveGameView peopleArray={peopleArray}
+                                 onInjuryTreat={({personId, injuryId, toolId}) => {
+                                     inputEvents.push(
+                                         function () {
+                                             treatPersonInjury({peopleArray, personId, injuryId, toolId});
+                                         }
+                                     );
+                                 }}
+                                 onPersonMoveEnd={({fromIndex, toIndex}) => {
+                                     inputEvents.push(
+                                         function () {
+                                             movePerson({peopleArray, fromIndex, toIndex});
+                                         }
+                                     );
+                                 }}/>,
+            document.getElementById("interactive"),
+        );
+
     }, 1000);
 
     window.setTimeMultiplier = function (val) {

@@ -1,5 +1,5 @@
 import Person from 'game/data/Person';
-import PersonCardView from 'game/view/PersonCardView';
+import PersonCardView from 'game/view/person/PersonCardView';
 import PropTypes from 'prop-types';
 import React from "react";
 import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
@@ -15,8 +15,6 @@ class DraggablePersonCardListView extends React.PureComponent {
          * @param {function} ({personId, injuryId})
          */
         onInjuryClick: PropTypes.func.isRequired,
-
-        onPersonMoveStart: PropTypes.func.isRequired,
 
         /**
          * @param {function} ({fromIndex, toIndex})
@@ -43,13 +41,9 @@ class DraggablePersonCardListView extends React.PureComponent {
         });
     }
 
-    onPersonDragStart() {
-        this.props.onPersonMoveStart();
-    }
-
     render() {
         return (
-            <DragDropContext onDragEnd={(data) => this.onPersonDragEnd(data)} onDragStart={() => this.onPersonDragStart()}>
+            <DragDropContext onDragEnd={(data) => this.onPersonDragEnd(data)}>
                 <Droppable droppableId="droppable" direction="horizontal">
                     {
                         (provided, snapshot) => {
